@@ -152,9 +152,53 @@ def fit_model_result(x_train, y_train, x_test, y_test, kernel_name, model):
     metrics.plot_confusion_matrix(reg, x_test, y_test, cmap='Greens', normalize='true',ax=ax)
     plt.show()
     
-    # Displaying ROC matrix
-    #fig, ax = plt.subplots(figsize=(10, 8))
-    #svc_disp = metrics.RocCurveDisplay.from_estimator(reg, x_test, y_test,ax=ax)
-    #plt.show()
-    
-    
+#using Kernel: RBF
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform
+from sklearn.svm import SVC
+
+param_grid = { 'C':loguniform(1,200),
+             'gamma': loguniform(0.001,1)}
+  
+grid = RandomizedSearchCV(SVC(kernel = 'rbf'), param_grid,n_iter=10, n_jobs=-1, random_state=42)
+grid.fit(X_train, Y_train)
+
+best_C = grid.best_estimator_.C
+best_gamma = grid.best_estimator_.gamma
+print(f"Best C value found from Random search: {best_C}")
+print(f"Best gamma value found from Random search: {best_gamma}")
+
+from sklearn.svm import SVC
+fit_model_result(X_train, Y_train, X_test, Y_test, 'RBF',SVC(kernel='rbf'))
+
+#using Kernel:Linear
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform
+from sklearn.svm import LinearSVC
+
+param_grid = { 'C':loguniform(0.01, 200)}
+  
+grid = RandomizedSearchCV(LinearSVC(), param_grid,n_iter=10, n_jobs=-1, random_state=42)
+grid.fit(X_train, Y_train)
+best_C = grid.best_estimator_.C
+print(f"Best C value found from Random search: {best_C}")
+fit_model_result(X_train, Y_train, X_test, Y_test, 'Linear', LinearSVC(C=best_C))
+
+#using Kernel:Poly
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import loguniform
+from sklearn.svm import SVC
+
+param_grid = { 'C':loguniform(0.01, 200),
+             'degree' : [1,2,3,4,5]}
+  
+grid = RandomizedSearchCV(SVC(kernel='poly'), param_grid,n_iter=10, n_jobs=-1, random_state=42)
+grid.fit(X_train, Y_train)
+best_C = grid.best_estimator_.C
+best_degree = grid.best_estimator_.degree
+print(f"Best C value found from Random search: {best_C}")
+print(f"Best degree value found from Random search: {best_degree}")
+fit_model_result(X_train, Y_train, X_test, Y_test, 'Poly',SVC(kernel='poly', C=best_C, degree=best_degree))
+
+#comparing the different Kernels
+results.groupby('Kernel Name').first()
