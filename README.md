@@ -11,3 +11,7 @@ Misc--- additional datasets
 Dependencies:
 1.Tensorflow2
 2.Python3 or above
+-------------------------------------
+7th December 2022
+New update: Unsupervised ML using KNN
+knn.ipynb----  Python file with ML using KNN algorithm with results
